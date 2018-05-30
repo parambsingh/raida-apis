@@ -1,51 +1,105 @@
 <?php
-define('ServiceUrl', 'https://raida.tech/get_collectible.php');
+
+define('WP_USE_THEMES', false);
+require('./wp-load.php');
 
 
-function pr($a = []) {
-    echo "<pre>";
-    print_r($a);
-    echo "</pre>";
-}
 
+function get_collectible($fileName, $dn = 1) {
+    $returnArray = ['error' => false];
+    $wp_upload_dir = wp_upload_dir();
+    $celebPath = $wp_upload_dir['basedir'].'/celebriums/';
+    $celebUrl = $wp_upload_dir['baseurl'].'/celebriums/';
 
-function fetchInventory() {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, ServiceUrl);
-    // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    //curl_setopt($ch, CURLOPT_HTTPGET, 1);
-    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_DNS_USE_GLOBAL_CACHE, false);
-    curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 2);
-
-    $fields = [
-        'password' => '5c4a9d7893e04',
-        'raida_password' => '5c4a9d7893e04',
-        'collectible_file_name' => (empty($_GET['collectible_file_name'])) ? 'bigfoot.jpg' : $_GET['collectible_file_name'],
-        'denomination' => (empty($_GET['denomination'])) ? 1 : $_GET['denomination']
+    $options = [
+        'dn'=> $dn,
+        'pk' =>BANK_PASSWORD,
+        'password'=>RAIDA_PASSWORD,
+        'c_id'=>$fileName
     ];
 
-    curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query($fields));
-
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    if (!$resultFromAPI = curl_exec($ch)) {
-        $resultFromAPI = curl_error($ch);
-    }
-
-    curl_close($ch);
-    return $resultFromAPI;
+    //~ $apiUrl = GET_COLLECTIBLE_API . http_build_query($options);
+//~ 
+    //~ try {
+        //~ //cURL starts
+        //~ $ch = curl_init();
+        //~ curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        //~ curl_setopt($ch, CURLOPT_HTTPHEADER, 0);
+        //~ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //~ curl_setopt($ch, CURLOPT_HTTPGET,true);
+        //~ $result = curl_exec($ch);
+//~ 
+        //~ //error handling for cURL
+        //~ if ($result === false) {
+            //~ $returnArray['error'] = true;
+            //~ if(curl_error($ch)) {
+                //~ $returnArray['message'] = curl_error($ch);
+            //~ }
+       //~ } else {
+		   //~ 
+            //~ $cc = json_decode($result, true);
+            //~ if((isset($cc['status']) && in_array($cc['status'], ["fail", "error"] )) || empty($cc['cloudcoin'])){
+					//~ $returnArray['error'] = true;
+					//~ $returnArray['message'] = $cc['message'];
+					//~ $headers = 'From: Celebrium™ <csupport@celebrium.com>' . "\r\n";
+					//~ wp_mail('satwinder.singh.21@gmail.com', "Get Collectible - Error Message Memo - ". $fileName .", dn - " .$dn, json_encode($cc), $headers);
+			//~ } else {
+				//~ $c = $cc['cloudcoin']['0'];
+				//~ 
+				//~ $celebName = $dn.'.CloudCoin.' .$c['sn'].'.'.$c['nn'].'.'.explode('.', $fileName)[0];
+				//~ $celebPath = $celebPath . $celebName . CELEB_EXTENSION;
+//~ 
+				//~ $f = fopen($celebPath,"w");
+				//~ fwrite($f,json_encode($cc, JSON_PRETTY_PRINT));
+				//~ fclose($f);
+//~ 
+				//~ $returnArray['url'] = get_site_url()."/download.php?file=" . $celebName;
+				//~ $returnArray['path'] = $celebPath;
+			//~ }
+        //~ }
+        //~ curl_close($ch);
+//~ 
+    //~ } catch (Exception $e) {
+        //~ $returnArray['error'] = true;
+        //~ $returnArray['message'] = $e->getMessage();
+        //~ $headers = 'From: Celebrium™ <csupport@celebrium.com>' . "\r\n";
+        //~ wp_mail('satwinder.singh.21@gmail.com', "Get Collectible - Error Message Memo - ". $fileName .", dn - " .$dn, $e->getMessage(), $headers);
+    //~ }
+    return $returnArray;
 }
 
-$result = fetchInventory();
 
-pr(json_decode($result, true));
-die;
+$order = [
+	[
+		'name'=>'brenda.jpg',
+		 'qty'=> 10 
+	],
+	[
+		'name'=>'greg.jpg',
+		 'qty'=> 10 
+	],
+	[
+		'name'=>'maggie.jpg',
+		 'qty'=> 10 
+	],
+	[
+		'name'=>'brock.jpg',
+		 'qty'=> 10 
+	],
+	[
+		'name'=>'nadine.jpg',
+		 'qty'=> 10 
+	]
+];
 
+$log = [];
 
-$result = connect("sn=399882&template=334&pk=99388377272");
+//~ foreach($order as $key =>  $item){
+	//~ $log[$key]['name'] = $item['name'];
+	//~ for($i = 0; $i < $item['qty']; $i++){
+			//~ $log[$key]['item'][$i] = get_collectible($item['name']);
+	//~ }
+//~ }
 
-pr($result);
+echo  json_encode($log); 
 die;
